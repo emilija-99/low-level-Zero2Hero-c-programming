@@ -1000,3 +1000,66 @@ In this file, file.h, we expose the interface to the file module, without giving
 
 
 #### Build Systems
+- https://makefiletutorial.com/
+Make it a tool that, when ran, finds a Makefile and executes the instructions to build a particular target.
+What Make actually does is it goes into the make file in the current directory and executes the script against whatever target you specified. If you do not specify the target it'll go forward and it'll run the make file default target. 
+```
+TARGET = bin/final
+SRC = $(wildcard src/*.c)
+OBJ = $(patsubst src/%.c, obj/%.o, $(SRC))
+
+default: $(TARGET)
+
+clean: rm -f obj/*.o
+	   rm -f bin/*
+$(TARGET): $(OBJ)
+	gcc -o $@ $?
+
+obj/%.o : src/%.c
+	gcc -c $< -o $@ -Iinclude
+	
+```
+The default is target, that says to be complete, first the $(TARGET) binary must be complete. Once that is complete, the instructions within default will be ran.
+
+**Symbols:**
+- $? represents a list of all input files given as a target
+- $< represent a single file given as a target
+- $@ represents the target of the rule
+
+```
+GNU nano 8.5                                       Makefile                                                    
+
+NAME = EMILIJA  
+FILE = demo.txt  
+  
+.DEFAULT_GOAL := help  
+  
+help:  
+       @echo "Available commands:"  
+       @echo " make hello - print greeting"  
+       @echo " make create - create a demo.txt"  
+       @echo " make clean - deletes demo.txt"  
+hello:  
+       @echo "Hello $(NAME)"  
+  
+create:    
+       echo "File is created by make!" > $(FILE)  
+clean:  
+       rm -f $(FILE)
+```
+
+#### Creating Libraries
+How to write code and see as library how to transport from one program to another and includes into code.
+There are two kinds of libraries and see there's one that's called a shared library / object or a static library / object > `/¬.a`also referred to as a dot archive to an archive file.  The primary difference between the two is that when you run your program in the case of shared object what actually happening is your program runs in blob > .elf executable and linkable format and represent code that is written. A shared object gets loaded outside of your elf, they're separated elf's in the same memory space and the loader will build a link between the two at runtime that tells your code how to get to the elf and vice versa. That is a shared object. Glib C runs as shared object.
+
+Difference between shared object and static object is how it is compiled. Shared object actually gets enabled at runtime, your program specifies and it needs it. And that's put in at compile time, but shared object gets loaded at runtime into memory whereas a static object all code run in compile time. Linker for static object will compile all elf files and link into one file. When it gets run at runtime all files exists in one file. The primary difference is that one happens at compile time and another in runtime. Shared object will always exists as one exact file that will be shared across.
+
+A shared object, shared library or `.so` file is a compiled ELF file that is linked into your program at run time. The benefit of a shared object is that the code is transported outside your final product meaning your ELF will be smaller without the duplicated code inside. however, this means that for your code to run, you will need to install library in the system root library directory, such as `/lib` or `/usr/lib`
+
+```
+# compiling the library
+gcc -o shared libteehee.so ./lib.c
+
+# adding the library to a project
+gcc -o main main.c -lteehee -L$(pwd)/lib
+```
