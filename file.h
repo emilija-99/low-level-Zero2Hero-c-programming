@@ -1,1 +1,0 @@
-int GLOBAL = 3;
